@@ -5,32 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
   runApp(App());
-  NetworkManager.handshake();
-
-  // final info = NetworkInfo();
-  // String? ip = await info.getWifiIP(); // e.g., 10.100.102.50
-  // String? subnet = ip?.substring(0, ip.lastIndexOf('.')); // 10.100.102
-  // String broadcast = '$subnet.255'; // 10.100.102.255
-
-  // final socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 45931);
-  // socket.broadcastEnabled = true;
-  // debugPrint("UDP socket is bound to ${socket.address.address}:${socket.port}");
-  
-  // socket.send(utf8.encode(ip!), InternetAddress(broadcast), socket.port);
-
-  // socket.listen((event) {
-  //     if (event == RawSocketEvent.read) {
-  //       Datagram? datagram;
-  //       while ((datagram = socket.receive()) != null) {
-  //         final msg = utf8.decode(datagram!.data);
-  //         debugPrint("Received message: $msg");
-  //       }
-  //     }
-  //   });
-
 }
 
 class App extends StatefulWidget {
@@ -55,6 +30,8 @@ class PageState extends State<App> {
     checklistPage = ChecklistPage();
 
     activePage = mapPage;
+
+    NetworkManager.handshake();
   }
 
   @override
