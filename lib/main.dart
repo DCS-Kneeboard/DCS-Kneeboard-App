@@ -35,6 +35,12 @@ class PageState extends State<App> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    NetworkManager.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(

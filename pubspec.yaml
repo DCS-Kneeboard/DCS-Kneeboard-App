@@ -11,6 +11,8 @@ dependencies:
     sdk: flutter
   network_info_plus: ^6.1.4
   logger: ^2.6.1
+  maplibre: ^0.2.2
+  proj4dart: ^2.1.0
 
 dev_dependencies:
   flutter_test:
