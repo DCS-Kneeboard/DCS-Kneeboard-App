@@ -20,14 +20,19 @@ class MapState extends State<MapPage> {
   void initState() {
     super.initState();
     App.logger.i("Map page is loaded!");
+    TerrainProjection terrain = SinaiProjection();
 
     NetworkManager.onUpdate.listen((state) {
       setState((() {
-        final point = SinaiProjection.simToLatLon(state.x, state.z);
+        final point = terrain.simToLatLon(state.x, state.z);
         _position = Position(point.x, point.y);
-        App.logger.i("x: ${state.x} z: ${state.z}");
       }));
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -37,21 +42,17 @@ class MapState extends State<MapPage> {
         options: MapOptions(
           initStyle: "https://tiles.openfreemap.org/styles/liberty"
         ),
+        onMapCreated: (controller) {
+          _mapController = controller;
+        },
         children: [
           MapCompass(hideIfRotatedNorth: true,),
           WidgetLayer(
             markers: [
-              Marker(
-                point: _position,
-                size: Size.square(50),
-                child: CircleAvatar(backgroundColor: Color.fromARGB(255, 0, 0, 255))
-              )
-            ],
+              Marker(point: _position, size: Size.square(20), child: CircleAvatar(backgroundColor: Colors.deepOrange))
+            ]
           )
         ],
-        onMapCreated: (controller) {
-          _mapController = controller;
-        },
       )
     );
   }

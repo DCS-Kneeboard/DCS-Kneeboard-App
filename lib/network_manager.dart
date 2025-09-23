@@ -68,7 +68,8 @@ class NetworkManager {
       String? packet = _getPacket();
       if (packet != null) {
         Map<String, dynamic> data = jsonDecode(packet);
-        GameState state = GameState(x: data["x"]!, z: data["z"]!, y: data["y"]!);
+        Map<String, dynamic> positionData = data["Position"];
+        GameState state = GameState(x: positionData["x"]!, z: positionData["z"]!, y: positionData["y"]!);
         _updateController.add(state);
       }
     });
