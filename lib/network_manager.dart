@@ -23,12 +23,10 @@ class NetworkManager {
     socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, Config.port);
     socket!.broadcastEnabled = true;
     String msg = Config.messageIdSend;
-    bool connectedToDCS = false;
 
-    int i = 0;
+    bool connected = false;
     App.logger.i("Performing handshake");
-    while (!connectedToDCS && i < 10) {
-      App.logger.i("Handshake test $i");
+    while (!connected) {
       socket!.send(
         utf8.encode(msg),
         InternetAddress(broadcast),
@@ -41,21 +39,16 @@ class NetworkManager {
         if (datagram != null) {
           final message = utf8.decode(datagram.data);
           if (message == Config.messageIdRecv) {
-            connectedToDCS = true;
+            App.logger.i("Established connection with DCS!\nDCS IP is ${datagram.address.address}");
+            socket!.close();
+            socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, Config.port);
+            socket!.listen(_startListening);
+            connected = true;
             break;
           }
         }
         await Future.delayed(Duration(milliseconds: 100));
       }
-
-      i++;
-    }
-
-    if (connectedToDCS) {
-      App.logger.i("Established connection with DCS!");
-      socket!.close();
-      socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, Config.port);
-      _startListening();
     }
   }
 
@@ -63,26 +56,23 @@ class NetworkManager {
     socket!.close();
   }
 
-  static void _startListening() {
-    Timer.periodic(Duration(milliseconds: 20), (timer) {
-      String? packet = _getPacket();
-      if (packet != null) {
-        Map<String, dynamic> data = jsonDecode(packet);
-        Map<String, dynamic> positionData = data["Position"];
-        GameState state = GameState(x: positionData["x"]!, z: positionData["z"]!, y: positionData["y"]!);
-        _updateController.add(state);
-      }
-    });
-  }
+  static void _startListening(RawSocketEvent event) {
+    if (event != RawSocketEvent.read) return;
+    
+    final datagram = socket!.receive();
+    if (datagram == null) return;
 
-  static String? _getPacket() {
-    if (socket == null) return null;
-    Datagram? datagram = socket!.receive();
-    if (datagram != null) {
-      final message = utf8.decode(datagram.data);
-      return message;
-    }
-    return null;
+    final packet = utf8.decode(datagram.data);
+    final data = jsonDecode(packet);
+    final positionData = data["Position"];
+    final state = GameState(
+      x: positionData["x"],
+      z: positionData["z"],
+      alt: data["Altitude"],
+      groundSpeed: data["GroundSpeed"],
+      trueHeading: data["TrueHeading"]
+    );
+    _updateController.add(state);
   }
 
   static Future<String?> _getBroadcast() async {

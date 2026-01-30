@@ -3,6 +3,7 @@ import 'package:dcs_kneeboard/pages/checklist.dart';
 import 'package:dcs_kneeboard/pages/map.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async {
   runApp(App());
@@ -26,6 +27,9 @@ class PageState extends State<App> {
   @override
   void initState() {
     super.initState();
+
+    WakelockPlus.enable();
+
     mapPage = MapPage();
     checklistPage = ChecklistPage();
 
@@ -37,6 +41,7 @@ class PageState extends State<App> {
   @override
   void dispose() {
     super.dispose();
+    WakelockPlus.disable();
     NetworkManager.dispose();
   }
 

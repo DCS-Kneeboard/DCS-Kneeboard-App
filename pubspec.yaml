@@ -13,6 +13,7 @@ dependencies:
   logger: ^2.6.1
   maplibre: ^0.2.2
   proj4dart: ^2.1.0
+  wakelock_plus: ^1.4.0
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +22,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/egm96-15.pgm
